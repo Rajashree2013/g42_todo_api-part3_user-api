@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import se.lexicon.todoapi.exception.ObjectNotFoundException;
 import se.lexicon.todoapi.model.dto.RoleDto;
 import se.lexicon.todoapi.model.dto.UserDto;
+import se.lexicon.todoapi.model.entity.Role;
 import se.lexicon.todoapi.model.entity.User;
 import se.lexicon.todoapi.repository.RoleRepository;
 import se.lexicon.todoapi.repository.UserRepository;
@@ -54,18 +55,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByUsername(String username) throws ObjectNotFoundException {
-        // todo: implement find by username
-        return null;
-    }
+        if (username == null) throw new IllegalArgumentException("User name was null");
+        User result = userRepository.findByUsername(username).orElseThrow(
+                () -> new ObjectNotFoundException("User not found"));
 
+        return modelMapper.map(result, UserDto.class);
+    }
     @Override
     public void disableUserByUsername(String username) {
         // todo: implement disable user by username
+        if (username == null) throw new IllegalArgumentException("User name was null");
+        userRepository.updateExpiredByUsername(username,true);
     }
 
     @Override
     public void enableUserByUsername(String username) {
         // todo: implement enable user by username
+        if (username == null) throw new IllegalArgumentException("User name was null");
+        userRepository.updateExpiredByUsername(username,false);
     }
 
 }
